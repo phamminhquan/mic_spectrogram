@@ -58,6 +58,7 @@ class AudioHandler(object):
 
         plt.clf()
         plt.pcolormesh(self.spec, cmap='inferno', vmin=0, vmax=70000)
+        plt.gcf().tight_layout()
         plt.pause(0.00001)
 
     def listen(self):

@@ -56,16 +56,6 @@ class AudioHandler(object):
                              frames_per_buffer = input_frames_per_block)
         return stream
     
-    def spectro_process(self, block):
-        f, t, Sxx = signal.spectrogram(block, rate, window=('kaiser',14), nperseg=128, nfft=1024, noverlap=64)
-        #f, t, Sxx = signal.spectrogram(block, rate, nperseg=128, nfft=512, noverlap=100)
-        #f, t, Sxx = signal.spectrogram(block, rate)
-        plt.clf()
-        plt.pcolormesh(t, f, Sxx, cmap='inferno')
-        plt.ylabel('Frequency [Hz]')
-        plt.xlabel('Time [sec]')
-        plt.pause(0.00001)
-    
     def fft_process(self, block):
         freq = np.absolute(np.fft.rfft(block, n=fft_size))
         self.spec = np.roll(self.spec, -1, axis=1)
@@ -87,12 +77,9 @@ class AudioHandler(object):
             return
         
         amplitude = get_rms(block)
-        if amplitude > self.threshold:
-            self.fft_process(block)
-            ani = animation.FuncAnimation(self.fig, self.plot_update)
-            plt.show()
-        else:
-            pass
+        self.fft_process(block)
+        ani = animation.FuncAnimation(self.fig, self.plot_update, frames=10, interval=1000)
+        plt.show()
         
 if __name__ == '__main__':
     audio = AudioHandler()
