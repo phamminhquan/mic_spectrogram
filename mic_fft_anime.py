@@ -13,6 +13,15 @@ fft_size = 2048
 time_slots = 128
 input_frames_per_block = int(rate*input_block_time)
 
+def animate(i):
+    try:
+        audio.listen()
+        data = audio.spec
+        quad.set_array(data.ravel())
+        return quad
+    except KeyboardInterrupt:
+        audio.stop()
+
 def get_rms(block):
     return np.sqrt(np.mean(np.square(block)))
 
@@ -22,9 +31,9 @@ class AudioHandler(object):
         self.stream = self.open_mic_stream()
         self.threshold = threshold
         self.spec = np.zeros((int(fft_size/2+1), time_slots), dtype=float)
-        self.fig = plt.figure()
-        self.ax = self.fig.add_subplot(1,1,1)
-        self.quad = plt.pcolormesh(self.spec, cmap='inferno', vmin=0, vmax=70000)
+        #self.fig = plt.figure()
+        #self.ax = self.fig.add_subplot(1,1,1)
+        #self.quad = plt.pcolormesh(self.spec, cmap='inferno', vmin=0, vmax=70000)
 
     def stop(self):
         self.stream.close()
@@ -61,10 +70,10 @@ class AudioHandler(object):
         self.spec = np.roll(self.spec, -1, axis=1)
         self.spec[:,-1] = freq
 
-    def plot_update(self, frame):
-        #self.ln.pcolormesh(self.spec, cmap='inferno', vmin=0, vmax=70000)
-        self.quad.set_array(self.spec.ravel())
-        return self.quad
+    #def plot_update(self, frame):
+    #    #self.ln.pcolormesh(self.spec, cmap='inferno', vmin=0, vmax=70000)
+    #    self.quad.set_array(self.spec.ravel())
+    #    return self.quad
 
     def listen(self):
         try:
@@ -76,15 +85,25 @@ class AudioHandler(object):
             print('Error recording: {}'.format(e))
             return
         
-        amplitude = get_rms(block)
+        #amplitude = get_rms(block)
         self.fft_process(block)
-        ani = animation.FuncAnimation(self.fig, self.plot_update, frames=10, interval=1000)
-        plt.show()
+        #ani = animation.FuncAnimation(self.fig, self.plot_update, frames=10, interval=1000)
+        #plt.pause(0.0001)
         
 if __name__ == '__main__':
     audio = AudioHandler()
-    try:
-        while True:
-            audio.listen()
-    except KeyboardInterrupt:
-        audio.stop()
+    fig = plt.figure()
+    ax1 = fig.add_subplot(1,1,1)
+    quad = ax1.pcolormesh(audio.spec, cmap='inferno', vmin=0, vmax=70000)
+    anime = animation.FuncAnimation(fig, animate, interval=1)
+    fig.canvas.draw()
+    plt.show()
+    #while True:
+    #    plt.draw()
+    #    plt.pause(0.00001)
+
+    #try:
+    #    while True:
+    #        audio.listen()
+    #except KeyboardInterrupt:
+    #    audio.stop()
