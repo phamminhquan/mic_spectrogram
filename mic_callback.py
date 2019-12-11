@@ -51,7 +51,8 @@ class AudioHandler(object):
                              rate = rate,
                              input = True,
                              input_device_index = dev_index,
-                             frames_per_buffer = input_frames_per_block)
+                             frames_per_buffer = input_frames_per_block,
+                             stream_callback=self.callback)
         return stream
        
     def fft_process(self, block):
@@ -62,10 +63,11 @@ class AudioHandler(object):
         #print(self.end-self.start)
         self.start = time.time()
 
-        plt.clf()
-        plt.pcolormesh(self.spec, cmap='inferno', vmin=0, vmax=70000)
-        plt.gcf().tight_layout()
-        plt.pause(0.00001)
+        #plt.clf()
+        #plt.pcolormesh(self.spec, cmap='inferno', vmin=0, vmax=70000)
+        #plt.gcf().tight_layout()
+        #plt.pause(0.00001)
+        plt.imshow(self.spec, vmin=0, vmax=70000, cmap='inferno')
 
     def listen(self):
         try:
@@ -82,11 +84,19 @@ class AudioHandler(object):
             self.fft_process(block)
         else:
             pass
-        
+
+    def callback(self, in_data, frame_count, time_info, status): 
+        count = len(in_data)/2
+        format = '%dh' % (count)
+        block = np.array(struct.unpack(format, in_data))
+        self.fft_process(block)
+        return (None, pyaudio.paContinue)
+
 if __name__ == '__main__':
     audio = AudioHandler()
     try:
         while True:
-            audio.listen()
+            #audio.listen()
+            pass
     except KeyboardInterrupt:
         audio.stop()
