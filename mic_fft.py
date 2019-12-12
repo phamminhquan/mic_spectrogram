@@ -3,7 +3,7 @@ import numpy as np
 import struct
 from scipy import signal
 import matplotlib.pyplot as plt
-import time
+#import time
 
 threshold = 10
 rate = 16000
@@ -21,8 +21,8 @@ class AudioHandler(object):
         self.stream = self.open_mic_stream()
         self.threshold = threshold
         self.spec = np.zeros((int(fft_size/2+1), time_slots), dtype=float)
-        self.start = time.time()
-        self.end = 0
+        #self.start = time.time()
+        #self.end = 0
 
     def stop(self):
         self.stream.close()
@@ -58,9 +58,9 @@ class AudioHandler(object):
         freq = np.absolute(np.fft.rfft(block, n=fft_size))
         self.spec = np.roll(self.spec, -1, axis=1)
         self.spec[:,-1] = freq
-        self.end = time.time()
+        #self.end = time.time()
         #print(self.end-self.start)
-        self.start = time.time()
+        #self.start = time.time()
 
         plt.clf()
         plt.pcolormesh(self.spec, cmap='inferno', vmin=0, vmax=70000)
