@@ -21,6 +21,10 @@ python3 mic_fft.py
 * Spectrogram frequency axis is from 0 to 8KHz
 * Almost realtime. However, samples are dropped from time to time
 
+## Example
+
+![example](./example.png)
+
 ## TODO:
 
 * Correct tick labels on axes
